@@ -1,0 +1,87 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+body {
+    background-color: #1f1f1f;
+    height: 100dvh;
+    display: flex;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.mines-container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    color: #c0c0c0;
+}
+
+.row {
+    display: flex;
+}
+
+.tile {
+    width: 32px;
+    height: 32px;
+    background-color: #c0c0c0;
+    /* border: 1px solid #808080; */
+    background-image: url("./assets/images/tile.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    image-rendering: pixelated;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.tile.flagged {
+    background-image: url("./assets/images/falgged-tile.png");
+}
+
+.tile.checked {
+    background-color: #666;
+    background-image: url("./assets/images/empty-tile.png");
+}
+
+.tile.mine {
+    background-image: url("./assets/images/mine-tile.png");
+}
+
+.tile.redmine {
+    background-image: url("./assets/images/redmine-tile.png");
+}
+
+.tile.one {
+    background-image: url("./assets/images/1.png");
+}
+
+.tile.two {
+    background-image: url("./assets/images/2.png");
+}
+
+.tile.three {
+    background-image: url("./assets/images/3.png");
+}
+
+.tile.four {
+    background-image: url("./assets/images/4.png");
+}
+
+.tile.five {
+    background-image: url("./assets/images/5.png");
+}
+
+.tile.six {
+    background-image: url("./assets/images/6.png");
+}
+
+.tile.seven {
+    background-image: url("./assets/images/7.png");
+}
+
+.tile.eight {
+    background-image: url("./assets/images/8.png");
+}
