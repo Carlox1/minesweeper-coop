@@ -6,6 +6,9 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 const server = http.createServer(app);
+/**
+ * @type {WebSocket.Server}
+ */
 const wss = new WebSocket.Server({ server });
 
 const lobbies = []
@@ -14,14 +17,38 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+/**
+ * @param {WebSocket} ws
+ * @param {import('http').IncomingMessage} req
+ */
 
-wss.on('connection', (ws) => {
-    console.log('Cliente conectado');
+wss.on('connection', (ws, req) => {
+    const { playerId, lobbyId } = req.url.split('?')[1].split('&').reduce((acc, curr) => {
+        const [key, value] = curr.split('=')
+        acc[key] = value
+        return acc
+    }, {})
+
+    ws.playerId = playerId
+    ws.lobbyId = lobbyId
 
     ws.on('message', (message) => {
-        console.log(`Mensaje recibido: ${message}`);
-        ws.send(`Echo: ${message}`);
-    });
+        message = message.toString()
+        const [action, x, y] = message.split(':')
+
+        if (action == 'click' || action == 'flag') {
+            wss.clients.forEach(client => {
+                if (client.lobbyId == ws.lobbyId && client.playerId != ws.playerId) {
+                    client.send(message)
+                }
+            })
+        }
+
+        if (action == "reset") {
+            const lobby = lobbies.find(l => l.id == ws.lobbyId)
+            lobby.tiles = createTiles(lobby.rows, lobby.cols)
+        }
+    })
 
     ws.on('close', () => {
         console.log('Cliente desconectado');
@@ -36,6 +63,10 @@ app.get('/tiles/:id', (req, res) => {
     const lobby = lobbies.find(l => l.id == req.params.id)
     res.json(lobby)
 });
+
+app.get("/", (req, res) => {
+    res.redirect('/create')
+})
 
 app.get('/create', (req, res) => {
     res.sendFile(__dirname + '/lobby.html');
@@ -54,7 +85,6 @@ app.post('/create', (req, res) => {
         tiles: createTiles(rows, cols)
     }
 
-
     lobbies.push(lobby)
     res.redirect(`/lobby/${lobby.id}`)
 });
@@ -63,11 +93,9 @@ app.get("/info", (req, res) => {
     res.json(lobbies)
 });
 
-server.listen(3000, () => {
-    console.log('Servidor corriendo en http://localhost:3000');
+server.listen(8752, () => {
+    console.log('(:(');
 });
-
-
 
 function createTiles(rows, cols) {
     const tiles = []
