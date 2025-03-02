@@ -47,6 +47,24 @@ function setUUID() {
     return newUUID
 }
 
+function nearMines(x, y) {
+    let minesCount = 0;
+
+    for (let i = x - 1; i <= x + 1; i++) {
+        for (let j = y - 1; j <= y + 1; j++) {
+            if (i < 0 || i >= rows || j < 0 || j >= cols) {
+                continue;
+            }
+            const mine = tiles.find(m => m.x == i && m.y == j)
+            if (mine.isMine) {
+                minesCount++
+            }
+        }
+    }
+
+    return minesCount
+}
+
 function createTiles() {
     for (let i = 0; i < rows; i++) {
         const row = document.createElement('div')
@@ -57,18 +75,47 @@ function createTiles() {
             tile.classList.add('tile')
 
             tile.onclick = () => {
+                if (gameState == 'lost' || gameState == "won") return resetGame();
                 checkTile(i, j)
                 ws.send('click:' + i + ':' + j)
             }
 
             tile.oncontextmenu = (e) => {
                 e.preventDefault()
+                if (gameState == 'lost' || gameState == "won") return resetGame();
                 flagTile(i, j)
                 ws.send('flag:' + i + ':' + j)
             }
 
             row.appendChild(tile)
-            tiles.find(m => m.x == i && m.y == j).el = tile
+            const t_tile = tiles.find(m => m.x == i && m.y == j)
+            t_tile.el = tile
+
+            if (t_tile.checked) tile.classList.add('checked')
+            if (t_tile.flagged) tile.classList.add('flagged')
+
+            const t_minesCount = nearMines(i, j)
+
+            if (t_tile.checked && t_minesCount > 0) {
+                if (t_minesCount == 1) {
+                    tile.classList.add('one')
+                } else if (t_minesCount == 2) {
+                    tile.classList.add('two')
+                } else if (t_minesCount == 3) {
+                    tile.classList.add('three')
+                } else if (t_minesCount == 4) {
+                    tile.classList.add('four')
+                } else if (t_minesCount == 5) {
+                    tile.classList.add('five')
+                } else if (t_minesCount == 6) {
+                    tile.classList.add('six')
+                } else if (t_minesCount == 7) {
+                    tile.classList.add('seven')
+                } else if (t_minesCount == 8) {
+                    tile.classList.add('eight')
+                }
+            }
+
         }
     }
 }
@@ -97,21 +144,7 @@ function checkTile(x, y) {
 
     tileInfo.checked = true
 
-    let t_minesCount = 0;
-    console.log("antes", t_minesCount)
-    for (let i = x - 1; i <= x + 1; i++) {
-        for (let j = y - 1; j <= y + 1; j++) {
-            if (i < 0 || i >= rows || j < 0 || j >= cols) {
-                continue;
-            }
-            const mine = tiles.find(m => m.x == i && m.y == j)
-            if (mine.isMine) {
-                t_minesCount++
-            }
-        }
-    }
-
-    console.log("despues", t_minesCount)
+    const t_minesCount = nearMines(x, y)
 
     if (t_minesCount > 0) {
         if (t_minesCount == 1) {

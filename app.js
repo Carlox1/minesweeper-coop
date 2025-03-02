@@ -36,12 +36,18 @@ wss.on('connection', (ws, req) => {
         message = message.toString()
         const [action, x, y] = message.split(':')
 
-        if (action == 'click' || action == 'flag') {
+        if (action == "click" || action == "flag") {
             wss.clients.forEach(client => {
                 if (client.lobbyId == ws.lobbyId && client.playerId != ws.playerId) {
                     client.send(message)
                 }
             })
+            if (action == "click") checkTile(lobbies.find(l => l.id == ws.lobbyId), parseInt(x), parseInt(y))
+            if (action == "flag") {
+                const lobby = lobbies.find(l => l.id == ws.lobbyId)
+                const tile = lobby.tiles.find(t => t.x == parseInt(x) && t.y == parseInt(y))
+                tile.flagged = !tile.flagged
+            }
         }
 
         if (action == "reset") {
@@ -117,5 +123,43 @@ function placeMines(tiles, minesCount) {
             continue
         }
         mine.isMine = true
+    }
+}
+
+function checkTile(lobby, x, y) {
+    const tiles = lobby.tiles
+    const rows = lobby.rows
+    const cols = lobby.cols
+
+    const tileInfo = tiles.find(m => m.x == x && m.y == y)
+    if (tileInfo.flagged) return
+
+    if (tileInfo.checked) return
+
+    tileInfo.checked = true
+
+    let t_minesCount = 0;
+
+    for (let i = x - 1; i <= x + 1; i++) {
+        for (let j = y - 1; j <= y + 1; j++) {
+            if (i < 0 || i >= rows || j < 0 || j >= cols) {
+                continue;
+            }
+            const mine = tiles.find(m => m.x == i && m.y == j)
+            if (mine.isMine) {
+                t_minesCount++
+            }
+        }
+    }
+
+    if (t_minesCount > 0) return
+
+    for (let i = x - 1; i <= x + 1; i++) {
+        for (let j = y - 1; j <= y + 1; j++) {
+            if (i < 0 || i >= rows || j < 0 || j >= cols) {
+                continue;
+            }
+            checkTile(lobby, i, j)
+        }
     }
 }
