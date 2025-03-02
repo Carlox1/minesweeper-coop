@@ -36,7 +36,9 @@ wss.on('connection', (ws, req) => {
         message = message.toString()
         const [action, x, y] = message.split(':')
 
-        if (action == "click" || action == "flag") {
+        if (action == "mouse") return
+
+        if (action == "click" || action == "flag" || action == "mouse") {
             wss.clients.forEach(client => {
                 if (client.lobbyId == ws.lobbyId && client.playerId != ws.playerId) {
                     client.send(message)
@@ -53,12 +55,13 @@ wss.on('connection', (ws, req) => {
         if (action == "reset") {
             const lobby = lobbies.find(l => l.id == ws.lobbyId)
             lobby.tiles = createTiles(lobby.rows, lobby.cols)
+            wss.clients.forEach(client => {
+                if (client.lobbyId == ws.lobbyId) {
+                    client.send("reset")
+                }
+            })
         }
     })
-
-    ws.on('close', () => {
-        console.log('Cliente desconectado');
-    });
 });
 
 app.get('/lobby/:id', (req, res) => {

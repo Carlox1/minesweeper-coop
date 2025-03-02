@@ -18,7 +18,9 @@ fetch('/tiles/' + window.location.pathname.split('/')[2],).then(data => data.jso
     rows = lobby.rows
     cols = lobby.cols
     minesCount = tiles.filter(m => m.isMine).length
-    minesCounter.innerText = minesCount
+
+    const flaggedMines = tiles.filter(m => m.flagged)
+    minesCounter.innerText = minesCount - flaggedMines.length
 
     ws = new WebSocket('/ws?' + "playerId=" + playerId + "&lobbyId=" + lobby.id)
 
@@ -31,7 +33,26 @@ fetch('/tiles/' + window.location.pathname.split('/')[2],).then(data => data.jso
         if (action == 'flag') {
             flagTile(parseInt(x), parseInt(y))
         }
+
+        if (action == "mouse") {
+            const rect = minesContainer.getBoundingClientRect();
+            document.querySelector('.coop-mouse').style.left = rect.left + x * rect.width + 'px';
+            document.querySelector('.coop-mouse').style.top = rect.top + y * rect.height + 'px';
+        }
+
+        if (action == 'reset') {
+            location.reload()
+        }
     }
+
+    // document.body.onmousemove = (e) => {
+    //     const rect = minesContainer.getBoundingClientRect();
+    //     const x = (e.clientX - rect.left) / rect.width;
+    //     const y = (e.clientY - rect.top) / rect.height;
+    
+    //     ws.send(`mouse:${x}:${y}`);
+    // };
+    
 
     createTiles()
 })
@@ -202,5 +223,4 @@ function flagTile(x, y) {
 
 function resetGame() {
     ws.send('reset:0:0')
-    location.reload()
 }

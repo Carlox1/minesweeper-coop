@@ -10,6 +10,12 @@ body {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
+.coop-mouse {
+    color: orange;
+    position: absolute;
+    background-color: orange;
+}
+
 .mines-container {
     display: flex;
     flex-direction: column;
