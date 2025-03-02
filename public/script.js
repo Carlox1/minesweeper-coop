@@ -24,6 +24,12 @@ fetch('/tiles/' + window.location.pathname.split('/')[2],).then(data => data.jso
 
     ws = new WebSocket('/ws?' + "playerId=" + playerId + "&lobbyId=" + lobby.id)
 
+    ws.onopen = () => {
+        setInterval(() => {
+            ws.send('ping')
+        } , 30000)
+    }
+
     ws.onmessage = (message) => {
         const [action, x, y] = message.data.split(':')
         if (action == 'click') {
