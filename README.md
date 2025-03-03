@@ -14,6 +14,6 @@ Buscaminas multijugador en tiempo real, donde varios jugadores pueden unirse a u
 - **Frontend**: HTML, CSS, JavaScript.
 - **Backend**: Node.js, Express.js, WebSocket.
 
-[Demo](minesweeper.carlox.es)
+[Demo](https://minesweeper.carlox.es)
 
 ![minesweeper multiplayer demo](https://i.imgur.com/5WL6WDp.png)
