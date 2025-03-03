@@ -11,9 +11,8 @@ body {
 }
 
 .coop-mouse {
-    color: orange;
     position: absolute;
-    background-color: orange;
+    width: 12px;
 }
 
 .mines-container {

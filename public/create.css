@@ -1,0 +1,32 @@
+.create__form {
+    color: white;
+    border: 1px solid #222;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #00000060;
+    margin: 0 auto;
+    min-width: 200px;
+    margin-top: 200px;
+}
+
+.create__form input {
+    border: 0;
+}
+
+.create__form button {
+    background-color: orange;
+    border: 0;
+    padding: 4px 8px;
+    margin-top: 4px;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: .2s all;
+    cursor: pointer;
+}
+
+.create__form button:hover {
+    background-color: rgb(255, 196, 0);
+}

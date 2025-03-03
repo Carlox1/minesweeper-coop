@@ -36,9 +36,7 @@ wss.on('connection', (ws, req) => {
         message = message.toString()
         const [action, x, y] = message.split(':')
 
-        if (action == "mouse") return
-
-        if (action == "click" || action == "flag" || action == "mouse") {
+        if (action == "click" || action == "flag") {
             wss.clients.forEach(client => {
                 if (client.lobbyId == ws.lobbyId && client.playerId != ws.playerId) {
                     client.send(message)
@@ -50,6 +48,14 @@ wss.on('connection', (ws, req) => {
                 const tile = lobby.tiles.find(t => t.x == parseInt(x) && t.y == parseInt(y))
                 tile.flagged = !tile.flagged
             }
+        }
+
+        if (action == "mouse") {
+            wss.clients.forEach(client => {
+                if (client.lobbyId == ws.lobbyId && client.playerId != ws.playerId) {
+                    client.send(message + `:${ws.playerId}`)
+                }
+            })
         }
 
         if (action == "reset") {
@@ -93,6 +99,14 @@ app.post('/create', (req, res) => {
         cols: cols,
         tiles: createTiles(rows, cols)
     }
+
+    const iv = setInterval(() => {
+        wss.clients.forEach(client => {
+            if (client.lobbyId == lobby.id) {
+                client.send('ping')
+            }
+        })
+    }, 30000);
 
     lobbies.push(lobby)
     res.redirect(`/lobby/${lobby.id}`)

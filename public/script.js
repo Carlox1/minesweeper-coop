@@ -31,7 +31,7 @@ fetch('/tiles/' + window.location.pathname.split('/')[2],).then(data => data.jso
     }
 
     ws.onmessage = (message) => {
-        const [action, x, y] = message.data.split(':')
+        const [action, x, y, cursorId] = message.data.split(':')
         if (action == 'click') {
             checkTile(parseInt(x), parseInt(y))
         }
@@ -41,9 +41,20 @@ fetch('/tiles/' + window.location.pathname.split('/')[2],).then(data => data.jso
         }
 
         if (action == "mouse") {
+            let cursor = document.getElementById(cursorId)
+            if (!cursor) {
+                cursor = document.createElement('div')
+                cursor.id = cursorId
+                cursor.classList.add('coop-mouse')
+                const color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+                cursor.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                <path fill="${color}" stroke="black" stroke-width="20" d="M0 55.2L0 426c0 12.2 9.9 22 22 22c6.3 0 12.4-2.7 16.6-7.5L121.2 346l58.1 116.3c7.9 15.8 27.1 22.2 42.9 14.3s22.2-27.1 14.3-42.9L179.8 320l118.1 0c12.2 0 22.1-9.9 22.1-22.1c0-6.3-2.7-12.3-7.4-16.5L38.6 37.9C34.3 34.1 28.9 32 23.2 32C10.4 32 0 42.4 0 55.2z"/>
+              </svg>`
+                document.body.appendChild(cursor)
+            }
             const rect = minesContainer.getBoundingClientRect();
-            document.querySelector('.coop-mouse').style.left = rect.left + x * rect.width + 'px';
-            document.querySelector('.coop-mouse').style.top = rect.top + y * rect.height + 'px';
+            cursor.style.left = rect.left + x * rect.width + 'px';
+            cursor.style.top = rect.top + y * rect.height + 'px';
         }
 
         if (action == 'reset') {
@@ -51,13 +62,13 @@ fetch('/tiles/' + window.location.pathname.split('/')[2],).then(data => data.jso
         }
     }
 
-    // document.body.onmousemove = (e) => {
-    //     const rect = minesContainer.getBoundingClientRect();
-    //     const x = (e.clientX - rect.left) / rect.width;
-    //     const y = (e.clientY - rect.top) / rect.height;
+    document.body.onmousemove = (e) => {
+        const rect = minesContainer.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
     
-    //     ws.send(`mouse:${x}:${y}`);
-    // };
+        ws.send(`mouse:${x}:${y}`);
+    };
     
 
     createTiles()
